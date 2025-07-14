@@ -1,4 +1,4 @@
-# Final Project Report: Evolving Optimal Neural Networks via a Genetic Algorithm for Medical Image Classification
+# Evolving Optimal Neural Networks via a Genetic Algorithm for Medical Image Classification
 
 ## 1. Executive Summary
 
@@ -17,7 +17,10 @@ To develop a highly accurate deep learning model for classifying blood cell imag
 `basophil`, `eosinophil`, `erythroblast`, `ig`, `lymphocyte`, `monocyte`, `neutrophil`, and `platelet`.
 
 **Dataset**:  
-The project utilizes a public dataset of **17,092 microscopic blood cell images**.
+This project uses a publicly available dataset containing 17,092 microscopic images of blood cells. The dataset provides a diverse collection of blood cell images ideal for classification tasks.
+
+You can access the dataset here:
+Blood Cells Image Dataset on [Kaggle](https://www.kaggle.com/datasets/unclesamulus/blood-cells-image-dataset/data)
 
 ### Exploratory Data Analysis (EDA) Summary
 
@@ -33,7 +36,7 @@ The project utilizes a public dataset of **17,092 microscopic blood cell images*
   - Test Set: 2,565 images (15%)
 
 <p align="center">
-  <img src="https://i.imgur.com/kS95QG4.png" width="700" alt="Class Distribution Chart">
+  <img src="results/plots/class_dist.png" width="700" alt="Class Distribution Chart">
   <br>
   <em><b>Figure 1:</b> Class distribution of the blood cell dataset.</em>
 </p>
@@ -47,7 +50,7 @@ The project was structured as a modular pipeline, with each component designed f
 **Tech Stack**:
 - **Core Libraries**: PyTorch, NumPy, Pandas, Scikit-learn  
 - **Visualization**: Matplotlib, Streamlit  
-- **Development Tools**: Python 3.11, Miniconda, VS Code  
+- **Development Tools**: Python 3.13, Miniconda, VS Code  
 
 ### 3.1. Dynamic CNN Model (`cnn_model.py`)
 
@@ -98,10 +101,11 @@ The GA was run for **10 generations** with a **population of 10 individuals**. F
 ### 4.1. GA Convergence and Performance
 
 <p align="center">
-  <img src="https://i.imgur.com/vH9jC9R.png" width="700" alt="GA Fitness History">
+  <img src="results/plots/fitness_history.png" width="700" alt="GA Fitness History">
   <br>
   <em><b>Figure 2:</b> Best validation accuracy (fitness) per generation.</em>
 </p>
+
 
 - **Rapid Discovery**: From 89.2% → 96.9% in just 4 generations  
 - **Convergence**: Plateau from generation 4 indicates search space optimization
@@ -147,13 +151,13 @@ Deployed as an interactive **Streamlit** application.
 
 This project demonstrates that a **Genetic Algorithm** can effectively automate both **hyperparameter optimization** and **neural architecture search**.
 
-### 🔑 Key Takeaways
+### Key Takeaways
 
 - **Automation Unlocks Performance**:  
   GA found high-performing, non-obvious configurations
 - **Robust Engineering is Essential**:  
   Checkpointing and modularity made long experiments possible
 - **Lifecycle Completion Matters**:  
-  From data to deployment — a complete ML workflow
+  From data to deployment, a complete ML workflow
 
 ---
