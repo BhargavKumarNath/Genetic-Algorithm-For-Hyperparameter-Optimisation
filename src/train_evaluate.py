@@ -14,9 +14,10 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 import numpy as np
-from src.cnn_model import DynamicCNN
-from src.data_loader import get_dataloaders
-from src.hpo_config import FITNESS_TRACKING_CONFIG
+
+from .cnn_model import DynamicCNN
+from .data_loader import get_dataloaders
+from .hpo_config import FITNESS_TRACKING_CONFIG
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE} for train_evaluate")
@@ -128,7 +129,7 @@ def train_and_evaluate_individual(individual_hp, generation_num, individual_num)
         return 0.0
 
 if __name__ == "__main__":
-    from src.hpo_config import sample_hyperparameters, HYPERPARAMETER_SPACE, FITNESS_TRACKING_CONFIG
+    from hpo_config import sample_hyperparameters, HYPERPARAMETER_SPACE, FITNESS_TRACKING_CONFIG
 
     print("Testing train_and_evaluate_individual function...")
     

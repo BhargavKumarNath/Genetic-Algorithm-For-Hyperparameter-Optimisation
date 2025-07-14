@@ -1,9 +1,19 @@
 # This file will define the search space for hyperparameters and GA settings
 import numpy as np
-from src.data_loader import IMAGE_SIZE, DATASET_MEAN, DATASET_STD
+import os
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DATA_DIR_RELATIVE = "data/blood_cell_images/"
+RESULTS_DIR_RELATIVE = "results/"
+
+# Data Constants
+DATASET_MEAN = [0.8742497563362122, 0.7491484880447388, 0.7213816046714783]
+DATASET_STD = [0.15781086683273315, 0.1840810924768448, 0.07911773025989532]
+IMAGE_SIZE = (224, 224)
+RANDOM_SEED = 46
 
 HYPERPARAMETER_SPACE = {
-    "lr": {"type": "log_range", "bounds": [-4, -2]},    # learning rate: 10^-4 to 10^-2
+    "lr": {"type": "log_range", "bounds": [-4, -2]},    
     "batch_size": {"type": "choices", "values": [16, 32, 64]},
     "optimizer": {"type": "choices", "values": ["adam", "sgd", "rmsprop"]},
 
@@ -26,8 +36,8 @@ HYPERPARAMETER_SPACE = {
 
 # --- GENETIC ALGORITHM PARAMETERS ---
 GA_CONFIG = {
-    "population_size": 10,      # Number of individuals in the population
-    "num_generations": 10,      # Number of generations to evolve
+    "population_size": 10,      # Number of individuals in the population - 10
+    "num_generations": 10,      # Number of generations to evolve - 10
     "mutation_rate": 0.15,      # Probability of mutating a gene
     "crossover_rate": 0.7,      # Probability of performing crossover
     "elitism_count": 2,         # number of best individuals to carry over to the next generation
@@ -35,13 +45,13 @@ GA_CONFIG = {
 }
 
 
-# --- Training Parameters for Fitness Evaluation ---
+# Training Parameters for Fitness Evaluation
 # Each individual (hyperparameter set) will be trained for a short duration.
 
 FITNESS_TRACKING_CONFIG = {
-    "num_epochs": 10,        # Number of epochs to train CNN for fitness evaluation. We keep this low to spee dup HPO
+    "num_epochs": 10,        # Number of epochs to train CNN for fitness evaluation. We keep this low to spee dup HPO - 10
     "patience": 3,          # Early stopping patience during ditness evaluation
-    "data_dir": "C:/Project/Bloodcell/data/blood_cell_images/",     # data dir
+    "data_dir": os.path.join(PROJECT_ROOT, DATA_DIR_RELATIVE),     # data dir
     "num_classes": 8,       # from EDA
     "image_size": IMAGE_SIZE,   # From data_loader
     "dataset_mean": DATASET_MEAN,   # From data_loader
@@ -49,23 +59,23 @@ FITNESS_TRACKING_CONFIG = {
 }
 
 
-# --- FINAL MODEL TRAINING PARAMETERS (after HPO) ---
+# FINAL MODEL TRAINING PARAMETERS (after HPO)
 # Once the best hyperparameters are found, train the final model for longer
 FINAL_TRAINING_CONFIG = {
-    "num_epochs": 3,
+    "num_epochs": 50,   # 50
     "patience": 10,
     "data_dir": FITNESS_TRACKING_CONFIG["data_dir"],
     "num_classes": FITNESS_TRACKING_CONFIG["num_classes"],
     "image_size": FITNESS_TRACKING_CONFIG["image_size"],
     "dataset_mean": FITNESS_TRACKING_CONFIG["dataset_mean"],
     "dataset_std": FITNESS_TRACKING_CONFIG["dataset_std"],
-    "results_dir": "C:/Project/Bloodcell/results/",
+    "results_dir": os.path.join(PROJECT_ROOT, RESULTS_DIR_RELATIVE),
     "best_model_name": "best_cnn_model.pth",
     "ga_log_name": "ga_hpo_log.csv"
 }
 
 
-# --- Helper function to sample a random individual ---
+# Helper function to sample a random individual
 def sample_hyperparameters(space):
     """Samples random set of hyperparameters from the defined space"""
     individual = {}
@@ -84,7 +94,7 @@ def sample_hyperparameters(space):
             else:
                 # Float range
                 if step:
-                    num_steps = int((high - low) / step)
+                    num_steps = int(round((high - low) / step))
                     val = low + np.random.randint(0, num_steps + 1) * step
                     val = round(val, len(str(step).split(".")[-1]) if "." in str(step) else 0)  # preserve precision of step
                 else:
@@ -99,6 +109,12 @@ def sample_hyperparameters(space):
     return individual
 
 if __name__ == "__main__":
+    print("--- Project Configuration ---")
+    print(f"Project Root: {PROJECT_ROOT}")
+    print(f"Data Directory: {FINAL_TRAINING_CONFIG["data_dir"]}")
+    print(f"Results Directory: {FINAL_TRAINING_CONFIG["results_dir"]}")
+
+    
     print("--- Hyperparameter Space ---")
     for k, v in HYPERPARAMETER_SPACE.items():
         print(f"{k}: {v}")

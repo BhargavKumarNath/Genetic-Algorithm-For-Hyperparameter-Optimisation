@@ -1,0 +1,15 @@
+Best Validation Accuracy: 0.9692
+
+Best Hyperparameters:
+  lr: 0.000210
+  batch_size: 16
+  optimizer: adam
+  num_conv_blocks: 4
+  conv_filters_start: 32
+  kernel_size: 3
+  conv_activation: elu
+  conv_dropout_rate: 0.000000
+  num_fc_layers: 1
+  fc_neurons_start: 256
+  fc_activation: relu
+  fc_dropout_rate: 0.000000

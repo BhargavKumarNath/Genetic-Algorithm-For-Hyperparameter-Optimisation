@@ -3,13 +3,8 @@
 import os
 import torch
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, random_split, Subset
-
-# Use values from the EDA file
-DATASET_MEAN = [0.8742497563362122, 0.7491484880447388, 0.7213816046714783]
-DATASET_STD = [0.15781086683273315, 0.1840810924768448, 0.07911773025989532]
-IMAGE_SIZE = (224, 224)
-RANDOM_SEED = 46
+from torch.utils.data import DataLoader, random_split
+from .hpo_config import DATASET_MEAN, DATASET_STD, IMAGE_SIZE, RANDOM_SEED
 
 def get_transforms(train=True):
     """Returns appropriate transforms for training or validation/testing"""
@@ -56,6 +51,12 @@ def get_dataloaders(data_dir, batch_size, train_val_test_split=(0.7, 0.15, 0.15)
     val_len = int(train_val_test_split[1] * total_len)
     test_len = total_len - train_len - val_len
 
+    # Ensure splits add up to the total length
+    if train_len + val_len + test_len != total_len:
+        print("Adjusting train_len to account for rounding errors in split.")
+        train_len = total_len - val_len - test_len
+
+
     print(f"Dataset loaded: {total_len} images, {num_classes} classes: {class_names}")
     print(f"Splitting: Train={train_len}, Validation={val_len}, Test={test_len}")
 
@@ -91,7 +92,7 @@ def get_dataloaders(data_dir, batch_size, train_val_test_split=(0.7, 0.15, 0.15)
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        pin_memory=True
+        pin_memory=True,
     )
 
     val_loader = DataLoader(
@@ -113,16 +114,18 @@ def get_dataloaders(data_dir, batch_size, train_val_test_split=(0.7, 0.15, 0.15)
 
 
 if __name__ == "__main__":
-    DATA_PATH = "C:/Project/Bloodcell/data/blood_cell_images/"
+    import sys
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-    # Check if data path exists relative to this file
-    script_dir = os.path.dirname(__file__)
-    abs_data_path = os.path.join(script_dir, DATA_PATH)
-    if not os.path.exists(abs_data_path):
-        print(f"Default data path {abs_data_path} not found. Please ensure dataset is in the correct location.")
+    from src.hpo_config import FINAL_TRAINING_CONFIG
+
+    DATA_PATH = FINAL_TRAINING_CONFIG["data_dir"]
+
+    if not os.path.exists(DATA_PATH):
+        print(f"Data path {DATA_PATH} not found. Please check your configuration in hpo_config.py.")
     else:
-        print(f"Loading data from: {abs_data_path}")
-        train_dl, val_dl, test_dl, n_classes, classes = get_dataloaders(abs_data_path, batch_size=32)
+        print(f"Loading data from: {DATA_PATH}")
+        train_dl, val_dl, test_dl, n_classes, classes = get_dataloaders(DATA_PATH, batch_size=32)
 
         print(f"\nNumber of classes: {n_classes}")
         print(f"Class names: {classes}")

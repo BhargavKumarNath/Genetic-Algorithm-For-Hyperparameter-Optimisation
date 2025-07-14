@@ -50,12 +50,15 @@ def save_ga_results(best_individual_hp, best_fitness, fitness_history, config, r
 
 def train_final_model(best_hp, final_config, device):
     """Trains the final model using the best hyperparameters found by Genetic Algorithm"""
-    from data_loader import get_dataloaders
-    from cnn_model import DynamicCNN
-    from train_evaluate import get_optimizer, evaluate_model
+    from .data_loader import get_dataloaders
+    from .cnn_model import DynamicCNN
+    from .train_evaluate import get_optimizer, evaluate_model
 
     print("\n--- Training Final Model with Best Hyperparameters ---")
     print(f"Best HPs: {best_hp}")
+
+    best_val_accuracy = 0.0
+    test_accuracy = -1.0
 
     # 1. DataLoaders
     train_loader, val_loader, test_loader, num_classes, class_names = get_dataloaders(
@@ -79,7 +82,6 @@ def train_final_model(best_hp, final_config, device):
     criterion = nn.CrossEntropyLoss()
 
     # 4. Training Loop
-    best_val_accuracy = 0.0
     epochs_no_improve = 0
 
     print(f"Starting final training for {final_config["num_epochs"]} epochs...")

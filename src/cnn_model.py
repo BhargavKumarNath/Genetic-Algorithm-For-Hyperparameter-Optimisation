@@ -9,7 +9,7 @@ def get_activation_fn(activation_name_str):
     if activation_name_str == "relu":
         return nn.ReLU()
     elif activation_name_str == "leaky_relu":
-        return nn.ELU()
+        return nn.LeakyReLU()
     elif activation_name_str == "elu":
         return nn.ELU()
     else:
@@ -47,7 +47,7 @@ class DynamicCNN(nn.Module):
                 in_channels,
                 current_filters,
                 kernel_size=self.hp["kernel_size"],
-                padding=self.hp["kernel_size"] // 2
+                padding="same"
             )
             layers[f"bn{i+1}"] = nn.BatchNorm2d(current_filters)
             layers[f"act{i+1}"] = get_activation_fn(self.hp["conv_activation"])
@@ -56,7 +56,7 @@ class DynamicCNN(nn.Module):
                 layers[f"drop{i+1}"] = nn.Dropout2d(self.hp["conv_dropout_rate"])
             
             in_channels = current_filters
-            current_filters *= 2
+            current_filters = int(current_filters * 2)
         return nn.Sequential(layers)
     
     def _get_flattened_size(self):
@@ -80,9 +80,8 @@ class DynamicCNN(nn.Module):
                 layers[f"fc_drop{i+1}"] = nn.Dropout(self.hp["fc_dropout_rate"])
 
             in_features = current_neurons
-            if self.hp["num_fc_layers"] > 1 and i < self.hp["num_fc_layers"] - 1:   # Don't halve for the last custom for FC layer
-                current_neurons = max(current_neurons // 2, self.num_classes * 2)   # Ensure not too small before output layer
-                # Output layer
+            if self.hp["num_fc_layers"] > 1 and i < self.hp["num_fc_layers"] - 1:   
+                current_neurons = max(current_neurons // 2, self.num_classes * 2)
         layers["output"] = nn.Linear(in_features, self.num_classes)
 
         return nn.Sequential(layers)
@@ -95,7 +94,11 @@ class DynamicCNN(nn.Module):
     
 
 if __name__ == "__main__":
-    from hpo_config import sample_hyperparameters, HYPERPARAMETER_SPACE, FITNESS_TRACKING_CONFIG
+    import sys
+    import os
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+    from src.hpo_config import sample_hyperparameters, HYPERPARAMETER_SPACE, FITNESS_TRACKING_CONFIG
 
     # Example usege:
     print("Testing DynamicCNN generation...")
