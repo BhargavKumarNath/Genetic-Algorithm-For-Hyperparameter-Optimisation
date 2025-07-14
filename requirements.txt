@@ -1,5 +1,3 @@
-torch
-torchvision
 numpy
 pandas
 matplotlib
@@ -7,3 +5,5 @@ tqdm
 scikit-learn
 streamlit
 Pillow
+pyarrow
+protobuf
